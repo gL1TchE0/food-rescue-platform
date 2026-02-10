@@ -1,14 +1,27 @@
 // lib/services/auth_service.dart
 
 import 'dart:convert';
+import 'dart:io';
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 
 class AuthService {
-  static const String baseUrl = 'http://localhost:8000';
+  static String get baseUrl {
+    if (kIsWeb) {
+      return 'http://localhost:8000';
+    } else if (Platform.isAndroid) {
+      return 'http://10.0.2.2:8000';
+    } else {
+      return 'http://localhost:8000';
+    }
+  }
+
   static const String _tokenKey = 'auth_token';
   static const String _userKey = 'auth_user';
+  static const Duration _timeout = Duration(seconds: 10);
 
   // =========================================================================
   // TOKEN MANAGEMENT
@@ -62,24 +75,32 @@ class AuthService {
     required String password,
     required UserRole role,
   }) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/api/auth/register'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'name': name,
-        'email': email,
-        'phone': phone,
-        'password': password,
-        'role': role.value,
-      }),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/auth/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'name': name,
+          'email': email,
+          'phone': phone,
+          'password': password,
+          'role': role.value,
+        }),
+      ).timeout(_timeout);
 
-    final data = json.decode(response.body);
+      final data = json.decode(response.body);
 
-    if (response.statusCode == 200) {
-      return {'success': true, 'message': data['message'], 'email': data['email']};
-    } else {
-      return {'success': false, 'message': data['detail'] ?? 'Registration failed'};
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': data['message'], 'email': data['email']};
+      } else {
+        return {'success': false, 'message': data['detail'] ?? 'Registration failed'};
+      }
+    } on TimeoutException {
+      return {'success': false, 'message': 'Connection timed out. Please check your internet and try again.'};
+    } on SocketException {
+      return {'success': false, 'message': 'Cannot reach the server. Please check your connection.'};
+    } catch (e) {
+      return {'success': false, 'message': 'Something went wrong. Please try again.'};
     }
   }
 
@@ -88,23 +109,31 @@ class AuthService {
     required String email,
     required String otp,
   }) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/api/auth/verify-otp'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'email': email,
-        'otp': otp,
-      }),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/auth/verify-otp'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'email': email,
+          'otp': otp,
+        }),
+      ).timeout(_timeout);
 
-    final data = json.decode(response.body);
+      final data = json.decode(response.body);
 
-    if (response.statusCode == 200) {
-      final authToken = AuthToken.fromJson(data);
-      await saveAuthData(authToken);
-      return {'success': true, 'user': authToken.user};
-    } else {
-      return {'success': false, 'message': data['detail'] ?? 'OTP verification failed'};
+      if (response.statusCode == 200) {
+        final authToken = AuthToken.fromJson(data);
+        await saveAuthData(authToken);
+        return {'success': true, 'user': authToken.user};
+      } else {
+        return {'success': false, 'message': data['detail'] ?? 'OTP verification failed'};
+      }
+    } on TimeoutException {
+      return {'success': false, 'message': 'Connection timed out. Please try again.'};
+    } on SocketException {
+      return {'success': false, 'message': 'Cannot reach the server. Please check your connection.'};
+    } catch (e) {
+      return {'success': false, 'message': 'Something went wrong. Please try again.'};
     }
   }
 
@@ -113,21 +142,29 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/api/auth/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'email': email,
-        'password': password,
-      }),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'email': email,
+          'password': password,
+        }),
+      ).timeout(_timeout);
 
-    final data = json.decode(response.body);
+      final data = json.decode(response.body);
 
-    if (response.statusCode == 200) {
-      return {'success': true, 'message': data['message'], 'email': data['email']};
-    } else {
-      return {'success': false, 'message': data['detail'] ?? 'Login failed'};
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': data['message'], 'email': data['email']};
+      } else {
+        return {'success': false, 'message': data['detail'] ?? 'Login failed'};
+      }
+    } on TimeoutException {
+      return {'success': false, 'message': 'Connection timed out. Please check your internet and try again.'};
+    } on SocketException {
+      return {'success': false, 'message': 'Cannot reach the server. Please check your connection.'};
+    } catch (e) {
+      return {'success': false, 'message': 'Something went wrong. Please try again.'};
     }
   }
 
@@ -136,40 +173,56 @@ class AuthService {
     required String email,
     required String otp,
   }) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/api/auth/login/verify'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'email': email,
-        'otp': otp,
-      }),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/auth/login/verify'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'email': email,
+          'otp': otp,
+        }),
+      ).timeout(_timeout);
 
-    final data = json.decode(response.body);
+      final data = json.decode(response.body);
 
-    if (response.statusCode == 200) {
-      final authToken = AuthToken.fromJson(data);
-      await saveAuthData(authToken);
-      return {'success': true, 'user': authToken.user};
-    } else {
-      return {'success': false, 'message': data['detail'] ?? 'OTP verification failed'};
+      if (response.statusCode == 200) {
+        final authToken = AuthToken.fromJson(data);
+        await saveAuthData(authToken);
+        return {'success': true, 'user': authToken.user};
+      } else {
+        return {'success': false, 'message': data['detail'] ?? 'OTP verification failed'};
+      }
+    } on TimeoutException {
+      return {'success': false, 'message': 'Connection timed out. Please try again.'};
+    } on SocketException {
+      return {'success': false, 'message': 'Cannot reach the server. Please check your connection.'};
+    } catch (e) {
+      return {'success': false, 'message': 'Something went wrong. Please try again.'};
     }
   }
 
   /// Resend OTP
   Future<Map<String, dynamic>> resendOtp({required String email}) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/api/auth/resend-otp'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'email': email}),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/auth/resend-otp'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'email': email}),
+      ).timeout(_timeout);
 
-    final data = json.decode(response.body);
+      final data = json.decode(response.body);
 
-    if (response.statusCode == 200) {
-      return {'success': true, 'message': data['message']};
-    } else {
-      return {'success': false, 'message': data['detail'] ?? 'Failed to resend OTP'};
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': data['message']};
+      } else {
+        return {'success': false, 'message': data['detail'] ?? 'Failed to resend OTP'};
+      }
+    } on TimeoutException {
+      return {'success': false, 'message': 'Connection timed out. Please try again.'};
+    } on SocketException {
+      return {'success': false, 'message': 'Cannot reach the server. Please check your connection.'};
+    } catch (e) {
+      return {'success': false, 'message': 'Something went wrong. Please try again.'};
     }
   }
 }

@@ -18,11 +18,20 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+
 # ============================================================================
-# DATABASE CONFIGURATION (reuse from main.py)
+# ENVIRONMENT CONFIGURATION
+# ============================================================================
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# ============================================================================
+# DATABASE CONFIGURATION
 # ============================================================================
 
-DATABASE_URL = "postgresql://postgres:surplusSync%4012345@db.bwrwszeftkiwbybolzrh.supabase.co:5432/postgres"
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:milkmanisonthedoor@db.isfvqviuduiykpvupjcs.supabase.co:5432/postgres")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -32,9 +41,9 @@ Base = declarative_base()
 # JWT CONFIGURATION
 # ============================================================================
 
-SECRET_KEY = "your-secret-key-change-in-production-surplus-sync-2024"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
+SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production-surplus-sync-2024")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60 * 24))
 
 # ============================================================================
 # PASSWORD HASHING
@@ -43,14 +52,14 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # ============================================================================
-# EMAIL CONFIGURATION (Update with your SMTP settings)
+# EMAIL CONFIGURATION
 # ============================================================================
 
-SMTP_HOST = "smtp.gmail.com"
-SMTP_PORT = 587
-SMTP_USER = "your-email@gmail.com"  # Update this
-SMTP_PASSWORD = "your-app-password"  # Update this
-FROM_EMAIL = "noreply@foodrescue.com"
+SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
+SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SMTP_USER = os.getenv("SMTP_USER")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
+FROM_EMAIL = os.getenv("FROM_EMAIL", "noreply@foodrescue.com")
 
 # ============================================================================
 # ENUMS
@@ -210,18 +219,23 @@ def send_otp_email(email: str, otp: str, name: str = "User"):
         
         msg.attach(MIMEText(body, 'plain'))
         
-        # For development, just print the OTP
-        print(f"📧 OTP for {email}: {otp}")
+        # Log to console for development
+        print(f"📧 [DEV LOG] OTP for {email}: {otp}")
         
-        # Uncomment below for production email sending
-        # server = smtplib.SMTP(SMTP_HOST, SMTP_PORT)
-        # server.starttls()
-        # server.login(SMTP_USER, SMTP_PASSWORD)
-        # server.sendmail(FROM_EMAIL, email, msg.as_string())
-        # server.quit()
+        # Send actual email if credentials are provided
+        if SMTP_USER and SMTP_PASSWORD and SMTP_USER != "your-email@gmail.com":
+            print(f"📧 Sending email to {email} via {SMTP_HOST}...")
+            server = smtplib.SMTP(SMTP_HOST, SMTP_PORT)
+            server.starttls()
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.sendmail(FROM_EMAIL, email, msg.as_string())
+            server.quit()
+            print("✅ Email sent successfully")
+        else:
+            print("⚠️ SMTP credentials not set. Email not sent. Check console log above for OTP.")
         
     except Exception as e:
-        print(f"Error sending email: {e}")
+        print(f"❌ Error sending email: {e}")
 
 
 def decode_token(token: str) -> Optional[dict]:

@@ -8,18 +8,22 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Enum, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
-from geoalchemy2 import Geography
+# from geoalchemy2 import Geography  # Removed: PostGIS not needed with lat/lng columns
 from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import List, Optional
 import json
 import enum
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # ============================================================================
 # DATABASE CONFIGURATION
 # ============================================================================
 
-DATABASE_URL = "postgresql://postgres:surplusSync%4012345@db.bwrwszeftkiwbybolzrh.supabase.co:5432/postgres"
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:milkmanisonthedoor@db.isfvqviuduiykpvupjcs.supabase.co:5432/postgres")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -59,8 +63,7 @@ class Donation(Base):
     quantity_kg = Column(Float, nullable=False)
     description = Column(String)
     
-    # Geospatial data - PostGIS Geography type
-    location = Column(Geography(geometry_type='POINT', srid=4326))
+    # Geospatial data stored as lat/lng (no PostGIS needed)
     
     # For easy access without PostGIS queries
     latitude = Column(Float, nullable=False)
@@ -240,9 +243,6 @@ async def create_donation(donation: DonationCreate, db: Session = Depends(get_db
     This will trigger a WebSocket broadcast to update all connected map clients.
     """
     
-    # Create donation with PostGIS point
-    from geoalchemy2.elements import WKTElement
-    
     db_donation = Donation(
         donor_name=donation.donor_name,
         donor_phone=donation.donor_phone,
@@ -251,7 +251,6 @@ async def create_donation(donation: DonationCreate, db: Session = Depends(get_db
         description=donation.description,
         latitude=donation.latitude,
         longitude=donation.longitude,
-        location=WKTElement(f'POINT({donation.longitude} {donation.latitude})', srid=4326),
         address=donation.address,
         expires_at=donation.expires_at,
         status=DonationStatus.AVAILABLE
