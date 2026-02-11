@@ -1,0 +1,121 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.12.5, pytest-7.4.4, pluggy-1.6.0 -- C:\Users\balaj\AppData\Local\Programs\Python\Python312\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Study Material\Software Engineering\Sprint1
+plugins: anyio-4.12.0, asyncio-0.23.3
+asyncio: mode=Mode.STRICT
+collecting ... collected 57 items
+
+testing/test_backend.py::TestRootEndpoints::test_root_endpoint PASSED    [  1%]
+testing/test_backend.py::TestRootEndpoints::test_health_endpoint PASSED  [  3%]
+testing/test_backend.py::TestAuthEndpoints::test_register PASSED         [  5%]
+testing/test_backend.py::TestAuthEndpoints::test_login PASSED            [  7%]
+testing/test_backend.py::TestAuthEndpoints::test_get_me PASSED           [  8%]
+testing/test_backend.py::TestDonorEndpoints::test_get_all_donors PASSED  [ 10%]
+testing/test_backend.py::TestDonorEndpoints::test_create_donor PASSED    [ 12%]
+testing/test_backend.py::TestDonorEndpoints::test_get_my_donor_profile PASSED [ 14%]
+testing/test_backend.py::TestDonorEndpoints::test_update_my_donor_profile PASSED [ 15%]
+testing/test_backend.py::TestDonorEndpoints::test_get_donor_by_id PASSED [ 17%]
+testing/test_backend.py::TestDonorEndpoints::test_get_donor_tasks PASSED [ 19%]
+testing/test_backend.py::TestNgoEndpoints::test_get_all_ngos PASSED      [ 21%]
+testing/test_backend.py::TestNgoEndpoints::test_create_ngo PASSED        [ 22%]
+testing/test_backend.py::TestNgoEndpoints::test_get_my_ngo_profile PASSED [ 24%]
+testing/test_backend.py::TestNgoEndpoints::test_update_my_ngo_profile PASSED [ 26%]
+testing/test_backend.py::TestNgoEndpoints::test_get_ngo_by_id PASSED     [ 28%]
+testing/test_backend.py::TestNgoEndpoints::test_verify_ngo PASSED        [ 29%]
+testing/test_backend.py::TestNgoEndpoints::test_get_nearby_tasks PASSED  [ 31%]
+testing/test_backend.py::TestNgoEndpoints::test_claim_task PASSED        [ 33%]
+testing/test_backend.py::TestNgoEndpoints::test_get_ngo_tasks PASSED     [ 35%]
+testing/test_backend.py::TestNgoEndpoints::test_get_ngo_claimed_tasks PASSED [ 36%]
+testing/test_backend.py::TestVolunteerEndpoints::test_get_all_volunteers PASSED [ 38%]
+testing/test_backend.py::TestVolunteerEndpoints::test_create_volunteer PASSED [ 40%]
+testing/test_backend.py::TestVolunteerEndpoints::test_get_my_volunteer_profile PASSED [ 42%]
+testing/test_backend.py::TestVolunteerEndpoints::test_update_my_volunteer_profile PASSED [ 43%]
+testing/test_backend.py::TestVolunteerEndpoints::test_get_volunteer_by_id PASSED [ 45%]
+testing/test_backend.py::TestVolunteerEndpoints::test_update_volunteer_location PASSED [ 47%]
+testing/test_backend.py::TestVolunteerEndpoints::test_update_volunteer_status PASSED [ 49%]
+testing/test_backend.py::TestVolunteerEndpoints::test_get_current_task PASSED [ 50%]
+testing/test_backend.py::TestVolunteerEndpoints::test_get_task_history PASSED [ 52%]
+testing/test_backend.py::TestVolunteerEndpoints::test_go_online PASSED   [ 54%]
+testing/test_backend.py::TestVolunteerEndpoints::test_go_offline PASSED  [ 56%]
+testing/test_backend.py::TestTaskEndpoints::test_get_all_tasks PASSED    [ 57%]
+testing/test_backend.py::TestTaskEndpoints::test_get_task_by_id PASSED   [ 59%]
+testing/test_backend.py::TestTaskEndpoints::test_assign_task PASSED      [ 61%]
+testing/test_backend.py::TestTaskEndpoints::test_accept_task PASSED      [ 63%]
+testing/test_backend.py::TestTaskEndpoints::test_pickup_verify PASSED    [ 64%]
+testing/test_backend.py::TestTaskEndpoints::test_delivery_verify PASSED  [ 66%]
+testing/test_backend.py::TestTaskEndpoints::test_complete_task PASSED    [ 68%]
+testing/test_backend.py::TestTaskEndpoints::test_cancel_task PASSED      [ 70%]
+testing/test_backend.py::TestTaskEndpoints::test_auto_assign PASSED      [ 71%]
+testing/test_backend.py::TestTaskEndpoints::test_reassign_task PASSED    [ 73%]
+testing/test_backend.py::TestAdminEndpoints::test_get_stats PASSED       [ 75%]
+testing/test_backend.py::TestAdminEndpoints::test_get_stats_overview PASSED [ 77%]
+testing/test_backend.py::TestAdminEndpoints::test_get_volunteer_stats PASSED [ 78%]
+testing/test_backend.py::TestAdminEndpoints::test_get_all_users PASSED   [ 80%]
+testing/test_backend.py::TestAdminEndpoints::test_get_admin_ngos PASSED  [ 82%]
+testing/test_backend.py::TestAdminEndpoints::test_get_admin_donations PASSED [ 84%]
+testing/test_backend.py::TestAdminEndpoints::test_approve_ngo PASSED     [ 85%]
+testing/test_backend.py::TestRatingsEndpoints::test_rate_task PASSED     [ 87%]
+testing/test_backend.py::TestRatingsEndpoints::test_get_volunteer_ratings PASSED [ 89%]
+testing/test_backend.py::TestRatingsEndpoints::test_get_volunteer_rating_summary PASSED [ 91%]
+testing/test_backend.py::TestDispatcherEndpoints::test_get_dispatcher_tasks PASSED [ 92%]
+testing/test_backend.py::TestDispatcherEndpoints::test_dispatcher_assign_task PASSED [ 94%]
+testing/test_backend.py::TestDispatcherEndpoints::test_get_dispatcher_stats PASSED [ 96%]
+testing/test_backend.py::TestDonorTaskCreation::test_create_donation_task PASSED [ 98%]
+testing/test_backend.py::TestNgoVerifyReceipt::test_verify_receipt PASSED [100%]
+
+============================== warnings summary ===============================
+..\..\..\Users\balaj\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:271
+..\..\..\Users\balaj\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:271
+..\..\..\Users\balaj\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:271
+..\..\..\Users\balaj\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:271
+..\..\..\Users\balaj\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:271
+..\..\..\Users\balaj\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:271
+..\..\..\Users\balaj\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:271
+  C:\Users\balaj\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\_internal\_config.py:271: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+backend\database.py:8
+  C:\Study Material\Software Engineering\Sprint1\testing\..\backend\database.py:8: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+testing/test_backend.py: 57 warnings
+  C:\Study Material\Software Engineering\Sprint1\testing\..\backend\utils\redis_manager.py:33: DeprecationWarning: Call to deprecated close. (Use aclose() instead) -- Deprecated since version 5.0.0.
+    await self.redis_client.close()
+
+testing/test_backend.py: 115 warnings
+  C:\Users\balaj\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\schema.py:3593: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+testing/test_backend.py::TestAuthEndpoints::test_login
+  C:\Study Material\Software Engineering\Sprint1\testing\..\backend\utils\auth.py:40: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    expire = datetime.utcnow() + expires_delta
+
+testing/test_backend.py: 53 warnings
+  C:\Study Material\Software Engineering\Sprint1\testing\..\backend\utils\auth.py:42: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+
+testing/test_backend.py: 53 warnings
+  C:\Users\balaj\AppData\Local\Programs\Python\Python312\Lib\site-packages\jose\jwt.py:311: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    now = timegm(datetime.utcnow().utctimetuple())
+
+testing/test_backend.py::TestAdminEndpoints::test_get_stats
+testing/test_backend.py::TestAdminEndpoints::test_get_stats_overview
+  C:\Study Material\Software Engineering\Sprint1\testing\..\backend\api\v1\admin.py:140: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    week_ago = datetime.utcnow() - timedelta(days=7)
+
+testing/test_backend.py::TestAdminEndpoints::test_get_stats
+testing/test_backend.py::TestAdminEndpoints::test_get_stats_overview
+  C:\Study Material\Software Engineering\Sprint1\testing\..\backend\api\v1\admin.py:173: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "timestamp": datetime.utcnow().isoformat()
+
+testing/test_backend.py::TestDispatcherEndpoints::test_get_dispatcher_stats
+  C:\Study Material\Software Engineering\Sprint1\testing\..\backend\api\v1\dispatcher.py:120: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    today = datetime.utcnow().date()
+
+testing/test_backend.py::TestDonorTaskCreation::test_create_donation_task
+  C:\Study Material\Software Engineering\Sprint1\testing\test_backend.py:616: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    "expiry_time": (datetime.utcnow() + timedelta(hours=4)).isoformat(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================= 57 passed, 293 warnings in 87.66s (0:01:27) =================

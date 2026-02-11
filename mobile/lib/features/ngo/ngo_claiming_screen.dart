@@ -10,15 +10,15 @@ import 'widgets/qr_code_dialog.dart';
 class NgoClaimingScreen extends ConsumerStatefulWidget {
   final bool showAppBar;
   final VoidCallback? onClaimSuccess;
-  
-  const NgoClaimingScreen({super.key, this.showAppBar = true, this.onClaimSuccess});
+
+  const NgoClaimingScreen(
+      {super.key, this.showAppBar = true, this.onClaimSuccess});
 
   @override
   ConsumerState<NgoClaimingScreen> createState() => _NgoClaimingScreenState();
 }
 
 class _NgoClaimingScreenState extends ConsumerState<NgoClaimingScreen> {
-  
   List<Task> _donations = [];
   List<Task> _filteredDonations = [];
   bool _isLoading = false;
@@ -37,9 +37,8 @@ class _NgoClaimingScreenState extends ConsumerState<NgoClaimingScreen> {
     if (_selectedFilter == null) {
       _filteredDonations = List.from(_donations);
     } else {
-      _filteredDonations = _donations
-          .where((d) => d.foodType == _selectedFilter)
-          .toList();
+      _filteredDonations =
+          _donations.where((d) => d.foodType == _selectedFilter).toList();
     }
   }
 
@@ -62,7 +61,7 @@ class _NgoClaimingScreenState extends ConsumerState<NgoClaimingScreen> {
       final apiService = ref.read(apiServiceProvider);
       final List<dynamic> data = await apiService.getNgoNearbyTasks();
       final donations = data.map((json) => Task.fromJson(json)).toList();
-      
+
       // Filter out expired donations on the client side as well if needed
       // preventing null expiryTime issues
       final now = DateTime.now();
@@ -82,14 +81,15 @@ class _NgoClaimingScreenState extends ConsumerState<NgoClaimingScreen> {
       if (mounted) {
         setState(() {
           // Check if error is 403 (Forbidden) -> Pending Approval
-          if (e.toString().contains('403') || e.toString().contains('Forbidden')) {
-             _error = 'PENDING_APPROVAL';
+          if (e.toString().contains('403') ||
+              e.toString().contains('Forbidden')) {
+            _error = 'PENDING_APPROVAL';
           } else {
-             _error = e.toString();
+            _error = e.toString();
           }
           _isLoading = false;
         });
-        
+
         // Only show snackbar for non-403 errors
         if (_error != 'PENDING_APPROVAL') {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -112,7 +112,7 @@ class _NgoClaimingScreenState extends ConsumerState<NgoClaimingScreen> {
     try {
       final apiService = ref.read(apiServiceProvider);
       await apiService.claimTask(donation.id);
-      
+
       if (mounted) {
         // Show QR code dialog
         await showDialog(
@@ -120,7 +120,8 @@ class _NgoClaimingScreenState extends ConsumerState<NgoClaimingScreen> {
           barrierDismissible: false,
           builder: (context) => QrCodeDialog(
             donationId: donation.id,
-            donorName: "Donor", // Placeholder until we have real donor name
+            qrData: "TEST123",
+            donorName: "Donor",
           ),
         );
 
@@ -165,22 +166,24 @@ class _NgoClaimingScreenState extends ConsumerState<NgoClaimingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      appBar: widget.showAppBar ? AppBar(
-        title: const Text(
-          'Available Donations',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: const Color(0xFF4CAF50),
-        foregroundColor: Colors.white,
-        elevation: 2,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _isLoading ? null : _loadDonations,
-            tooltip: 'Refresh',
-          ),
-        ],
-      ) : null,
+      appBar: widget.showAppBar
+          ? AppBar(
+              title: const Text(
+                'Available Donations',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              backgroundColor: const Color(0xFF4CAF50),
+              foregroundColor: Colors.white,
+              elevation: 2,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: _isLoading ? null : _loadDonations,
+                  tooltip: 'Refresh',
+                ),
+              ],
+            )
+          : null,
       body: RefreshIndicator(
         onRefresh: _loadDonations,
         color: const Color(0xFF4CAF50),
@@ -190,7 +193,8 @@ class _NgoClaimingScreenState extends ConsumerState<NgoClaimingScreen> {
   }
 
   /// Build filter chip
-  Widget _buildFilterChip(String label, FoodType filterValue, Color color, IconData icon) {
+  Widget _buildFilterChip(
+      String label, FoodType filterValue, Color color, IconData icon) {
     final isSelected = _selectedFilter == filterValue;
     return Padding(
       padding: const EdgeInsets.only(right: 8),
@@ -256,11 +260,16 @@ class _NgoClaimingScreenState extends ConsumerState<NgoClaimingScreen> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildFilterChip('Veg/Vegetables', FoodType.veg, Colors.green, Icons.eco),
-                _buildFilterChip('Non-Veg', FoodType.nonVeg, Colors.red, Icons.restaurant),
-                _buildFilterChip('Mixed', FoodType.mixed, Colors.orange, Icons.lunch_dining),
-                _buildFilterChip('Snack', FoodType.snack, Colors.purple, Icons.cookie),
-                _buildFilterChip('Vegan', FoodType.vegan, Colors.teal, Icons.spa),
+                _buildFilterChip(
+                    'Veg/Vegetables', FoodType.veg, Colors.green, Icons.eco),
+                _buildFilterChip(
+                    'Non-Veg', FoodType.nonVeg, Colors.red, Icons.restaurant),
+                _buildFilterChip(
+                    'Mixed', FoodType.mixed, Colors.orange, Icons.lunch_dining),
+                _buildFilterChip(
+                    'Snack', FoodType.snack, Colors.purple, Icons.cookie),
+                _buildFilterChip(
+                    'Vegan', FoodType.vegan, Colors.teal, Icons.spa),
               ],
             ),
           ),
@@ -289,19 +298,20 @@ class _NgoClaimingScreenState extends ConsumerState<NgoClaimingScreen> {
         ),
       );
     }
-    
+
     // PENDING APPROVAL STATE
     if (_error == 'PENDING_APPROVAL') {
       return ListView(
         children: [
-           SizedBox(height: MediaQuery.of(context).size.height * 0.2),
-           Center(
+          SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+          Center(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.verified_user_outlined, size: 80, color: Colors.orange),
+                  const Icon(Icons.verified_user_outlined,
+                      size: 80, color: Colors.orange),
                   const SizedBox(height: 24),
                   const Text(
                     'Registration Pending',
@@ -319,7 +329,8 @@ class _NgoClaimingScreenState extends ConsumerState<NgoClaimingScreen> {
                     icon: const Icon(Icons.refresh),
                     label: const Text('Check Status'),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
                     ),
                   ),
                 ],
@@ -371,7 +382,8 @@ class _NgoClaimingScreenState extends ConsumerState<NgoClaimingScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.inbox_outlined, size: 80, color: Colors.grey.shade400),
+                Icon(Icons.inbox_outlined,
+                    size: 80, color: Colors.grey.shade400),
                 const SizedBox(height: 16),
                 const Text(
                   'No donations available',
@@ -396,7 +408,8 @@ class _NgoClaimingScreenState extends ConsumerState<NgoClaimingScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.filter_alt_off, size: 64, color: Colors.grey),
+                      const Icon(Icons.filter_alt_off,
+                          size: 64, color: Colors.grey),
                       const SizedBox(height: 16),
                       const Text('No matching donations'),
                       TextButton(
@@ -412,7 +425,7 @@ class _NgoClaimingScreenState extends ConsumerState<NgoClaimingScreen> {
                   itemBuilder: (context, index) {
                     final donation = _filteredDonations[index];
                     final isClaimingThis = _claimingDonationId == donation.id;
-                    
+
                     return DonationCard(
                       task: donation,
                       onClaim: () => _claimDonation(donation),

@@ -1,0 +1,58 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.12.5, pytest-7.4.4, pluggy-1.6.0 -- C:\Users\balaj\AppData\Local\Programs\Python\Python312\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Study Material\Software Engineering\Sprint1
+plugins: anyio-4.12.0, asyncio-0.23.3
+asyncio: mode=Mode.STRICT
+collecting ... collected 48 items
+
+testing/test_frontend.py::TestPageFilesExist::test_home_page PASSED      [  2%]
+testing/test_frontend.py::TestPageFilesExist::test_login_page PASSED     [  4%]
+testing/test_frontend.py::TestPageFilesExist::test_register_page PASSED  [  6%]
+testing/test_frontend.py::TestPageFilesExist::test_admin_dashboard PASSED [  8%]
+testing/test_frontend.py::TestPageFilesExist::test_dispatcher_dashboard PASSED [ 10%]
+testing/test_frontend.py::TestPageFilesExist::test_ngo_dashboard PASSED  [ 12%]
+testing/test_frontend.py::TestComponentFilesExist::test_component_exists[Navbar.tsx] PASSED [ 14%]
+testing/test_frontend.py::TestComponentFilesExist::test_component_exists[HeroSection.tsx] PASSED [ 16%]
+testing/test_frontend.py::TestComponentFilesExist::test_component_exists[FeaturesSection.tsx] PASSED [ 18%]
+testing/test_frontend.py::TestComponentFilesExist::test_component_exists[IntelligentDistribution.tsx] PASSED [ 20%]
+testing/test_frontend.py::TestComponentFilesExist::test_component_exists[EcosystemSection.tsx] PASSED [ 22%]
+testing/test_frontend.py::TestComponentFilesExist::test_component_exists[CTASection.tsx] PASSED [ 25%]
+testing/test_frontend.py::TestComponentFilesExist::test_component_exists[TrustedByMarquee.tsx] PASSED [ 27%]
+testing/test_frontend.py::TestComponentFilesExist::test_component_exists[Footer.tsx] PASSED [ 29%]
+testing/test_frontend.py::TestComponentFilesExist::test_component_exists[ParallaxBackground.tsx] PASSED [ 31%]
+testing/test_frontend.py::TestComponentFilesExist::test_component_exists[RevealOnScroll.tsx] PASSED [ 33%]
+testing/test_frontend.py::TestLibFilesExist::test_lib_exists[api-config.ts] PASSED [ 35%]
+testing/test_frontend.py::TestLibFilesExist::test_lib_exists[api-service.ts] PASSED [ 37%]
+testing/test_frontend.py::TestLibFilesExist::test_lib_exists[auth-context.tsx] PASSED [ 39%]
+testing/test_frontend.py::TestLibFilesExist::test_lib_exists[toast-context.tsx] PASSED [ 41%]
+testing/test_frontend.py::TestLibFilesExist::test_lib_exists[websocket-service.ts] PASSED [ 43%]
+testing/test_frontend.py::TestPackageJson::test_has_name PASSED          [ 45%]
+testing/test_frontend.py::TestPackageJson::test_has_required_dependencies PASSED [ 47%]
+testing/test_frontend.py::TestPackageJson::test_has_dev_script PASSED    [ 50%]
+testing/test_frontend.py::TestPackageJson::test_has_build_script PASSED  [ 52%]
+testing/test_frontend.py::TestTsConfig::test_tsconfig_exists PASSED      [ 54%]
+testing/test_frontend.py::TestTsConfig::test_tsconfig_valid_json PASSED  [ 56%]
+testing/test_frontend.py::TestApiConfig::test_has_auth_endpoints PASSED  [ 58%]
+testing/test_frontend.py::TestApiConfig::test_has_task_endpoints PASSED  [ 60%]
+testing/test_frontend.py::TestApiConfig::test_has_volunteer_endpoints PASSED [ 62%]
+testing/test_frontend.py::TestComponentStructure::test_component_has_export[Navbar.tsx] PASSED [ 64%]
+testing/test_frontend.py::TestComponentStructure::test_component_has_export[HeroSection.tsx] PASSED [ 66%]
+testing/test_frontend.py::TestComponentStructure::test_component_has_export[FeaturesSection.tsx] PASSED [ 68%]
+testing/test_frontend.py::TestComponentStructure::test_component_has_export[IntelligentDistribution.tsx] PASSED [ 70%]
+testing/test_frontend.py::TestComponentStructure::test_component_has_export[EcosystemSection.tsx] PASSED [ 72%]
+testing/test_frontend.py::TestComponentStructure::test_component_has_export[CTASection.tsx] PASSED [ 75%]
+testing/test_frontend.py::TestComponentStructure::test_component_has_export[TrustedByMarquee.tsx] PASSED [ 77%]
+testing/test_frontend.py::TestComponentStructure::test_component_has_export[Footer.tsx] PASSED [ 79%]
+testing/test_frontend.py::TestComponentStructure::test_component_has_export[ParallaxBackground.tsx] PASSED [ 81%]
+testing/test_frontend.py::TestComponentStructure::test_component_has_export[RevealOnScroll.tsx] PASSED [ 83%]
+testing/test_frontend.py::TestAuthContext::test_exports_auth_provider PASSED [ 85%]
+testing/test_frontend.py::TestAuthContext::test_exports_use_auth PASSED  [ 87%]
+testing/test_frontend.py::TestApiService::test_has_login_method PASSED   [ 89%]
+testing/test_frontend.py::TestApiService::test_has_register_method PASSED [ 91%]
+testing/test_frontend.py::TestApiService::test_has_get_me_method PASSED  [ 93%]
+testing/test_frontend.py::TestLayoutAndStyles::test_layout_exists PASSED [ 95%]
+testing/test_frontend.py::TestLayoutAndStyles::test_globals_css_exists PASSED [ 97%]
+testing/test_frontend.py::TestNextBuild::test_next_build PASSED          [100%]
+
+============================= 48 passed in 22.26s =============================

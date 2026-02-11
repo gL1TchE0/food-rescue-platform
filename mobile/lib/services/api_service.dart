@@ -4,8 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// API Service for communicating with unified backend
 class ApiService {
   // Using LAN IP for physical device testing
-  // static const String baseUrl = 'http://localhost:8000/api/v1'; // Emulator only
-  static const String baseUrl = 'http://10.186.157.145:8000/api/v1'; // Physical Device LAN IP
+  static const String baseUrl = 'http://localhost:8000/api/v1'; // Emulator only
+  //static const String baseUrl = 'http://10.186.157.145:8000/api/v1'; // Physical Device LAN IP
   
   late final Dio _dio;
   String? _authToken;

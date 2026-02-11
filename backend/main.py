@@ -57,7 +57,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS.split(","),
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -95,6 +95,9 @@ async def health_check():
         "websocket": websocket_status
     }
 
+
+# Save reference to raw FastAPI app (for tests that need dependency_overrides)
+fastapi_app = app
 
 # Mount Socket.IO (Must wrap FastAPI to handle paths correctly at root)
 app = socketio.ASGIApp(socket_manager.sio, app)
