@@ -27,7 +27,7 @@ The authentication system provides secure, role-based access control with a two-
 ### Auth Flow Diagram
 
 ```
-┌──────────────┐    POST /api/auth/register    ┌──────────────┐
+┌──────────────┐    POST /api/auth/register     ┌──────────────┐
 │   Sign Up    │ ─────────────────────────────► │  Save User   │
 │   Screen     │                                │  (unverified)│
 └──────┬───────┘                                └──────┬───────┘
