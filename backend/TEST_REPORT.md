@@ -3,315 +3,146 @@
 **Date:** 2026-02-12  
 **Framework:** pytest 9.0.2  
 **Database:** Supabase PostgreSQL  
-**Python:** 3.13.2  
-**Total Tests:** 35  
-**Result:** ✅ ALL 35 PASSED (84.32 seconds)
+**Total Tests:** 38  
+**Result:** ✅ ALL 38 PASSED
+
+This report details every test case executed, explaining exactly **what it checks** and **why it's important**.
 
 ---
 
-## 📋 Table of Contents
+## 1️⃣ Authentication Utilities (`tests/test_auth.py`)
 
-1. [Test Summary](#test-summary)
-2. [Detailed Test Results](#detailed-test-results)
-3. [Testing Methodology](#testing-methodology)
-4. [How to Run the Tests](#how-to-run-the-tests)
-5. [File Structure](#file-structure)
+These **Unit Tests** verify the core security functions in `auth.py` without needing the full API.
 
----
+### 🔐 Password Hashing
 
-## Test Summary
+| Test Case | What It Checks | Why It Matters |
+|-----------|----------------|----------------|
+| `test_get_password_hash_deterministic` | Checks if hashing the same password twice produces the **same output**. | Critical for verifying passwords later (hash matching). |
+| `test_get_password_hash_is_hex` | Verifies the hash format is a **64-character hexadecimal string** (SHA-256). | Ensures compatibility with database storage fields. |
+| `test_verify_password_correct` | verifying a **correct password** against its hash returns `True`. | The core mechanism for logging users in. |
+| `test_verify_password_incorrect` | verifying a **wrong password** against a hash returns `False`. | Prevents unauthorized access with bad passwords. |
 
-| Test File | Module Tested | Tests | Status |
-|-----------|--------------|-------|--------|
-| `tests/test_auth.py` | `auth.py` (Password & JWT utilities) | 12 | ✅ All Passed |
-| `tests/test_routes_auth.py` | `routes/auth.py` (Auth API endpoints) | 7 | ✅ All Passed |
-| `tests/test_routes_donations.py` | `routes/donations.py` (Donation API endpoints) | 14 | ✅ All Passed |
-| `tests/test_main.py` | `main.py` (Root & Health endpoints) | 2 | ✅ All Passed |
-| **Total** | | **35** | **✅ All Passed** |
+### 🎟 JWT Token Operations
 
----
+| Test Case | What It Checks | Why It Matters |
+|-----------|----------------|----------------|
+| `test_create_access_token_returns_string` | calling `create_access_token` returns a **valid string**. | Ensures the login endpoint can actually return a token. |
+| `test_decode_access_token_valid` | decoding a valid token returns correct data (email, user_id, role). | The API needs to trust who the user claims to be. |
+| `test_decode_access_token_invalid` | decoding a **manipulated/garbage token** raises a 401 error. | security against attackers forging tokens. |
+| `test_decode_access_token_expired` | decoding an **expired token** raises a 401 error. | Tokens must stop working after their 30-min lifetime. |
+| `test_decode_access_token_missing_sub` | decoding a token without a "subject" (email) raises a 401 error. | Prevents malformed tokens from crashing the app. |
 
-## Detailed Test Results
+### 👤 User Authentication
 
-### 1. `test_auth.py` — Authentication Utilities (12 Tests)
-
-These tests verify the core authentication functions in `auth.py`.
-
-#### Password Hashing (4 tests)
-
-| # | Test Name | What It Tests | Expected Outcome | Result |
-|---|-----------|--------------|------------------|--------|
-| 1 | `test_get_password_hash_deterministic` | Same password always produces the same hash | Hash of "hello" called twice → both are equal | ✅ PASSED |
-| 2 | `test_get_password_hash_is_hex` | Hash output format is valid SHA-256 | Returns a 64-character lowercase hex string | ✅ PASSED |
-| 3 | `test_verify_password_correct` | Correct password verification | `verify_password("mypassword", hash)` → `True` | ✅ PASSED |
-| 4 | `test_verify_password_incorrect` | Wrong password rejection | `verify_password("wrongpassword", hash)` → `False` | ✅ PASSED |
-
-#### JWT Token Operations (5 tests)
-
-| # | Test Name | What It Tests | Expected Outcome | Result |
-|---|-----------|--------------|------------------|--------|
-| 5 | `test_create_access_token_returns_string` | Token creation | Returns a non-empty string | ✅ PASSED |
-| 6 | `test_decode_access_token_valid` | Decoding a valid token | Returns `TokenData` with correct email, user_id, role | ✅ PASSED |
-| 7 | `test_decode_access_token_invalid` | Decoding a garbage token | Raises `HTTPException` with status 401 | ✅ PASSED |
-| 8 | `test_decode_access_token_expired` | Decoding an expired token | Raises `HTTPException` with status 401 | ✅ PASSED |
-| 9 | `test_decode_access_token_missing_sub` | Token without email claim | Raises `HTTPException` with status 401 | ✅ PASSED |
-
-#### User Authentication (3 tests)
-
-| # | Test Name | What It Tests | Expected Outcome | Result |
-|---|-----------|--------------|------------------|--------|
-| 10 | `test_authenticate_user_success` | Valid email + password login | Returns the `User` object | ✅ PASSED |
-| 11 | `test_authenticate_user_wrong_password` | Correct email, wrong password | Returns `None` | ✅ PASSED |
-| 12 | `test_authenticate_user_nonexistent_email` | Email not in database | Returns `None` | ✅ PASSED |
+| Test Case | What It Checks | Why It Matters |
+|-----------|----------------|----------------|
+| `test_authenticate_user_success` | `authenticate_user` returns the **User object** for valid credentials. | The database lookup and password check work together. |
+| `test_authenticate_user_wrong_password` | `authenticate_user` returns **None** for a wrong password. | Login must fail securely. |
+| `test_authenticate_user_nonexistent_email` | `authenticate_user` returns **None** for an unknown email. | Prevents logging in to non-existent accounts. |
 
 ---
 
-### 2. `test_routes_auth.py` — Authentication API Routes (7 Tests)
+## 2️⃣ Authentication Routes (`tests/test_routes_auth.py`)
 
-These tests verify the auth API endpoints using FastAPI's `TestClient`.
+These **Integration Tests** verify the actual API endpoints (HTTP requests).
 
-#### POST `/api/auth/login` (3 tests)
+### 🔑 Login Endpoint (`POST /api/auth/login`)
 
-| # | Test Name | What It Tests | Expected Outcome | Result |
-|---|-----------|--------------|------------------|--------|
-| 1 | `test_login_success` | Login with valid credentials | Status 200 + JSON with `access_token` and `token_type: "bearer"` | ✅ PASSED |
-| 2 | `test_login_wrong_password` | Login with wrong password | Status 401 Unauthorized | ✅ PASSED |
-| 3 | `test_login_nonexistent_user` | Login with non-existent email | Status 401 Unauthorized | ✅ PASSED |
+| Test Case | What It Checks | Why It Matters |
+|-----------|----------------|----------------|
+| `test_login_success` | Valid login returns HTTP **200 OK** and a JSON with `access_token`. | Users must be able to log in and get a token. |
+| `test_login_wrong_password` | Wrong password returns HTTP **401 Unauthorized**. | Security: API rejects bad credentials. |
+| `test_login_nonexistent_user` | Unknown email returns HTTP **401 Unauthorized**. | Security: API rejects unknown users. |
 
-#### GET `/api/auth/me` (2 tests)
+### 👤 Current User (`GET /api/auth/me`)
 
-| # | Test Name | What It Tests | Expected Outcome | Result |
-|---|-----------|--------------|------------------|--------|
-| 4 | `test_get_me_authenticated` | Fetch user info with valid JWT | Status 200 + user email and role in response | ✅ PASSED |
-| 5 | `test_get_me_unauthenticated` | Fetch user info without token | Status 401 Unauthorized | ✅ PASSED |
+| Test Case | What It Checks | Why It Matters |
+|-----------|----------------|----------------|
+| `test_get_me_authenticated` | Request with a valid token returns the **logged-in user's details**. | The frontend needs to know who is logged in. |
+| `test_get_me_unauthenticated` | Request **without a token** returns HTTP **401 Unauthorized**. | Protects user data from public access. |
 
-#### GET `/api/auth/ngo` (2 tests)
+### 🏢 NGO Endpoint (`GET /api/auth/ngo`)
 
-| # | Test Name | What It Tests | Expected Outcome | Result |
-|---|-----------|--------------|------------------|--------|
-| 6 | `test_get_ngo_details` | NGO user fetches their NGO info | Status 200 + NGO name and approval_status | ✅ PASSED |
-| 7 | `test_get_ngo_non_ngo_user` | Non-NGO (DONOR) user tries to access NGO endpoint | Status 403 Forbidden | ✅ PASSED |
-
----
-
-### 3. `test_routes_donations.py` — Donation API Routes (14 Tests)
-
-These tests verify all donation-related API endpoints.
-
-#### GET `/api/donations/available` (2 tests)
-
-| # | Test Name | What It Tests | Expected Outcome | Result |
-|---|-----------|--------------|------------------|--------|
-| 1 | `test_get_available_donations` | Fetch available donations list | Status 200 + list containing the sample donation | ✅ PASSED |
-| 2 | `test_expired_donation_not_in_available` | Expired donations excluded | Status 200 + expired donation NOT in the list | ✅ PASSED |
-
-#### POST `/api/donations` (2 tests)
-
-| # | Test Name | What It Tests | Expected Outcome | Result |
-|---|-----------|--------------|------------------|--------|
-| 3 | `test_create_donation` | Create a new donation | Status 201 + donation with status "AVAILABLE" | ✅ PASSED |
-| 4 | `test_create_donation_missing_fields` | Submit incomplete data | Status 422 Unprocessable Entity | ✅ PASSED |
-
-#### GET `/api/donations` (1 test)
-
-| # | Test Name | What It Tests | Expected Outcome | Result |
-|---|-----------|--------------|------------------|--------|
-| 5 | `test_get_all_donations` | Fetch all donations | Status 200 + list containing the sample donation | ✅ PASSED |
-
-#### GET `/api/donations/{id}/verify` — QR Verification (2 tests)
-
-| # | Test Name | What It Tests | Expected Outcome | Result |
-|---|-----------|--------------|------------------|--------|
-| 6 | `test_verify_donation_success` | Verify an existing donation | Status 200 + `verified: true` | ✅ PASSED |
-| 7 | `test_verify_donation_not_found` | Verify non-existent donation | Status 404 Not Found | ✅ PASSED |
-
-#### PATCH `/api/donations/{id}/status` — Claiming (4 tests)
-
-| # | Test Name | What It Tests | Expected Outcome | Result |
-|---|-----------|--------------|------------------|--------|
-| 8 | `test_claim_donation_success` | Approved NGO claims available donation | Status 200 + status changes to "ASSIGNED" | ✅ PASSED |
-| 9 | `test_claim_already_assigned` | Claim a donation already assigned | Status 400 Bad Request | ✅ PASSED |
-| 10 | `test_claim_expired_donation` | Claim an expired donation | Status 400 Bad Request | ✅ PASSED |
-| 11 | `test_claim_donation_unauthenticated` | Claim without auth token | Status 401 Unauthorized | ✅ PASSED |
-
-#### PUT `/api/donations/{id}/verify` — Pickup Verification (3 tests)
-
-| # | Test Name | What It Tests | Expected Outcome | Result |
-|---|-----------|--------------|------------------|--------|
-| 12 | `test_verify_pickup_success` | NGO verifies own donation pickup | Status 200 + status changes to "COMPLETED" | ✅ PASSED |
-| 13 | `test_verify_pickup_wrong_ngo` | Different NGO tries to verify | Status 403 Forbidden | ✅ PASSED |
-| 14 | `test_verify_pickup_not_assigned` | Verify a non-ASSIGNED donation | Status 400 or 403 (depends on check order) | ✅ PASSED |
+| Test Case | What It Checks | Why It Matters |
+|-----------|----------------|----------------|
+| `test_get_ngo_details` | An **NGO user** can fetch their own NGO details. | NGOs need to see their profile info. |
+| `test_get_ngo_non_ngo_user` | A **Donor/Volunteer** trying to access this gets HTTP **403 Forbidden**. | Role-Based Access Control (RBAC) is working. |
 
 ---
 
-### 4. `test_main.py` — Application Endpoints (2 Tests)
+## 3️⃣ Donation Routes (`tests/test_routes_donations.py`)
 
-| # | Test Name | What It Tests | Expected Outcome | Result |
-|---|-----------|--------------|------------------|--------|
-| 1 | `test_root_returns_api_info` | `GET /` root endpoint | Status 200 + message, version, status fields | ✅ PASSED |
-| 2 | `test_health_check` | `GET /health` health check | Status 200 + `status: "healthy"` | ✅ PASSED |
+These **Integration Tests** cover the main business logic: donating, claiming, and verifying food.
 
----
+### 📦 Available Donations (`GET /api/donations/available`)
 
-## Testing Methodology
+| Test Case | What It Checks | Why It Matters |
+|-----------|----------------|----------------|
+| `test_get_available_donations` | Returns a list containing donations with status **"AVAILABLE"**. | NGOs need to see what food is up for grabs. |
+| `test_expired_donation_not_in_available` | Ensures **expired food** does NOT appear in the list. | Safety: Don't let NGOs claim spoiled food. |
 
-### 1. Technology Stack
+### ➕ Create Donation (`POST /api/donations`)
 
-- **pytest** — test runner and assertion framework
-- **FastAPI TestClient** (powered by `httpx`) — simulates HTTP requests to the API without starting a real server
-- **SQLAlchemy** — ORM used to interact with the Supabase PostgreSQL database
+| Test Case | What It Checks | Why It Matters |
+|-----------|----------------|----------------|
+| `test_create_donation` | Creating a donation returns HTTP **201 Created** and the correct data. | Donors must be able to submit food. |
+| `test_create_donation_missing_fields` | Submitting without required fields (e.g., name) returns HTTP **422**. | Data integrity: Rejects incomplete forms. |
 
-### 2. Database Strategy: Transaction Rollback
+### 📋 Get All Donations (`GET /api/donations`)
 
-Instead of using a separate test database, we connect to the **same Supabase PostgreSQL** database but wrap each test in a database transaction that is **rolled back** after the test completes.
+| Test Case | What It Checks | Why It Matters |
+|-----------|----------------|----------------|
+| `test_get_all_donations` | Admin endpoint returns **all donations** regardless of status. | For admin dashboards/debugging. |
 
-```
-┌─────────────────────────────────────────┐
-│  Test starts                             │
-│  ├── Open DB connection                  │
-│  ├── BEGIN TRANSACTION                   │
-│  ├── Insert test data (NGO, User, etc.)  │
-│  ├── Run test assertions                 │
-│  ├── ROLLBACK TRANSACTION ← nothing saved│
-│  └── Close connection                    │
-└─────────────────────────────────────────┘
-```
+### 🔍 QR Verification (`GET /api/donations/{id}/verify`)
 
-**Why this approach?**
-- ✅ Tests run against the real PostgreSQL database (same constraints, types, FK checks)
-- ✅ No test data pollutes the production database
-- ✅ Each test is fully isolated from others
-- ✅ No need to set up a separate test database
+| Test Case | What It Checks | Why It Matters |
+|-----------|----------------|----------------|
+| `test_verify_donation_success` | Scanning a valid QR code returns **verification details**. | Volunteers need to verify food before pickup. |
+| `test_verify_donation_not_found` | Scanning an invalid ID returns HTTP **404 Not Found**. | Handles bad/fake QR codes gracefully. |
 
-### 3. Test Fixtures (`conftest.py`)
+### 🏷 Claim Donation (`PATCH /api/donations/{id}/status`)
 
-We use **pytest fixtures** to create reusable test data:
+| Test Case | What It Checks | Why It Matters |
+|-----------|----------------|----------------|
+| `test_claim_donation_success` | An NGO claiming food updates status to **"ASSIGNED"** and links their ID. | The core feature: Booking food. |
+| `test_claim_already_assigned` | Trying to claim food that's **already taken** returns HTTP **400**. | Prevents double-booking race conditions. |
+| `test_claim_expired_donation` | Trying to claim **expired food** returns HTTP **400**. | Safety: Blocks claiming bad food even if ID is known. |
+| `test_claim_donation_unauthenticated` | Trying to claim **without logging in** returns HTTP **401**. | Only registered NGOs can claim food. |
 
-| Fixture | What It Creates |
-|---------|----------------|
-| `db_session` | A SQLAlchemy session bound to a rolled-back transaction |
-| `client` | FastAPI `TestClient` with `get_db` overridden to use the test session |
-| `sample_ngo` | An approved NGO with 500kg storage capacity |
-| `sample_user` | An NGO user linked to `sample_ngo` with password "password123" |
-| `donor_user` | A DONOR user (not an NGO) |
-| `sample_donation` | An AVAILABLE donation expiring in 5 hours |
-| `expired_donation` | An AVAILABLE donation that expired 1 hour ago |
-| `auth_headers` | `Authorization: Bearer <JWT>` headers for `sample_user` |
-| `donor_auth_headers` | `Authorization: Bearer <JWT>` headers for `donor_user` |
+### ✅ Pickup Verification (`PUT /api/donations/{id}/verify`)
 
-### 4. Dependency Injection Override
+| Test Case | What It Checks | Why It Matters |
+|-----------|----------------|----------------|
+| `test_verify_pickup_success` | The owning NGO verifying pickup updates status to **"COMPLETED"**. | Closes the loop: Food successfully rescued. |
+| `test_verify_pickup_wrong_ngo` | **Another NGO** trying to verify pickup gets HTTP **403 Forbidden**. | Security: You can't verify someone else's pickup. |
+| `test_verify_pickup_not_assigned` | Verifying a donation that hasn't been claimed yet returns HTTP **400/403**. | Logic check: Must claim before picking up. |
 
-FastAPI uses dependency injection for `get_db()`. In tests, we override this so every route handler uses our test session (which will be rolled back):
+### ⚖️ Capacity & Multiple Location Logic
 
-```python
-app.dependency_overrides[get_db] = _override_get_db
-```
-
-### 5. Test Categories
-
-| Category | Type | Description |
-|----------|------|-------------|
-| **Unit Tests** | Pure function tests | Test individual functions (`get_password_hash`, `verify_password`, `create_access_token`, `decode_access_token`) without needing a database |
-| **Integration Tests** | API endpoint tests | Test full request→response cycle through FastAPI routes, including database operations, authentication, and business logic |
+| Test Case | What It Checks | Why It Matters |
+|-----------|----------------|----------------|
+| `test_claim_exceeds_ngo_capacity` | Claiming a donation that exceeds the **NGO's total capacity** returns HTTP **403**. | Prevents hoarding/over-claiming beyond ability to store. |
+| `test_claim_for_specific_branch` | Claiming for a **specific branch ID** works and assigns the branch. | Multi-location NGOs need to route food to specific sites. |
+| `test_claim_exceeds_branch_capacity` | Claiming that exceeds a **single branch's capacity** returns HTTP **403**. | Even if NGO has space elsewhere, specific branch limits must be respected. |
 
 ---
 
-## How to Run the Tests
+## 4️⃣ Main App Routes (`tests/test_main.py`)
 
-### Prerequisites
+### 🌐 System Health
 
-Make sure pytest and httpx are installed:
-```bash
-d:\look\backend\venv\Scripts\python.exe -m pip install pytest httpx email-validator
-```
-
-### Run all tests
-```bash
-cd d:\look\backend
-d:\look\backend\venv\Scripts\python.exe -m pytest tests/ -v
-```
-
-### Run a specific test file
-```bash
-d:\look\backend\venv\Scripts\python.exe -m pytest tests/test_auth.py -v
-d:\look\backend\venv\Scripts\python.exe -m pytest tests/test_routes_donations.py -v
-```
-
-### Run a specific test class or test
-```bash
-d:\look\backend\venv\Scripts\python.exe -m pytest tests/test_auth.py::TestPasswordHashing -v
-d:\look\backend\venv\Scripts\python.exe -m pytest tests/test_auth.py::TestJWTTokens::test_decode_access_token_expired -v
-```
+| Test Case | What It Checks | Why It Matters |
+|-----------|----------------|----------------|
+| `test_root_returns_api_info` | Root URL (`/`) returns API name and version. | Basic connectivity check. |
+| `test_health_check` | `/health` returns status **"healthy"**. | Used by monitoring tools (AWS, Docker) to check if app is alive. |
 
 ---
 
-## File Structure
+## 📊 Summary Statistics
 
-```
-backend/
-├── tests/
-│   ├── __init__.py              # Makes tests a Python package
-│   ├── conftest.py              # Shared fixtures (DB session, test data, auth headers)
-│   ├── test_auth.py             # 12 tests — password hashing, JWT, authenticate_user
-│   ├── test_routes_auth.py      # 7 tests  — login, /me, /ngo endpoints
-│   ├── test_routes_donations.py # 14 tests — available, create, claim, verify, pickup
-│   └── test_main.py             # 2 tests  — root and health check
-├── pytest.ini                   # Pytest configuration
-├── auth.py                      # ← tested
-├── routes/
-│   ├── auth.py                  # ← tested
-│   └── donations.py             # ← tested
-├── main.py                      # ← tested
-├── models.py                    # Used by tests (ORM models)
-├── schemas.py                   # Used by tests (Pydantic schemas)
-└── database.py                  # Used by tests (DB connection)
-```
-
----
-
-## Raw Test Output
-
-```
-============================= test session starts =============================
-platform win32 -- Python 3.13.2, pytest-9.0.2, pluggy-1.6.0
-rootdir: D:\look\backend
-configfile: pytest.ini
-plugins: anyio-4.12.1
-
-tests/test_auth.py::TestPasswordHashing::test_get_password_hash_deterministic PASSED [  2%]
-tests/test_auth.py::TestPasswordHashing::test_get_password_hash_is_hex PASSED [  5%]
-tests/test_auth.py::TestPasswordHashing::test_verify_password_correct PASSED [  8%]
-tests/test_auth.py::TestPasswordHashing::test_verify_password_incorrect PASSED [ 11%]
-tests/test_auth.py::TestJWTTokens::test_create_access_token_returns_string PASSED [ 14%]
-tests/test_auth.py::TestJWTTokens::test_decode_access_token_valid PASSED [ 17%]
-tests/test_auth.py::TestJWTTokens::test_decode_access_token_invalid PASSED [ 20%]
-tests/test_auth.py::TestJWTTokens::test_decode_access_token_expired PASSED [ 22%]
-tests/test_auth.py::TestJWTTokens::test_decode_access_token_missing_sub PASSED [ 25%]
-tests/test_auth.py::TestAuthenticateUser::test_authenticate_user_success PASSED [ 28%]
-tests/test_auth.py::TestAuthenticateUser::test_authenticate_user_wrong_password PASSED [ 31%]
-tests/test_auth.py::TestAuthenticateUser::test_authenticate_user_nonexistent_email PASSED [ 34%]
-tests/test_main.py::TestRootEndpoint::test_root_returns_api_info PASSED  [ 37%]
-tests/test_main.py::TestHealthCheck::test_health_check PASSED            [ 40%]
-tests/test_routes_auth.py::TestLogin::test_login_success PASSED          [ 42%]
-tests/test_routes_auth.py::TestLogin::test_login_wrong_password PASSED   [ 45%]
-tests/test_routes_auth.py::TestLogin::test_login_nonexistent_user PASSED [ 48%]
-tests/test_routes_auth.py::TestGetMe::test_get_me_authenticated PASSED   [ 51%]
-tests/test_routes_auth.py::TestGetMe::test_get_me_unauthenticated PASSED [ 54%]
-tests/test_routes_auth.py::TestGetNGO::test_get_ngo_details PASSED       [ 57%]
-tests/test_routes_auth.py::TestGetNGO::test_get_ngo_non_ngo_user PASSED  [ 60%]
-tests/test_routes_donations.py::TestAvailableDonations::test_get_available_donations PASSED [ 62%]
-tests/test_routes_donations.py::TestAvailableDonations::test_expired_donation_not_in_available PASSED [ 65%]
-tests/test_routes_donations.py::TestCreateDonation::test_create_donation PASSED [ 68%]
-tests/test_routes_donations.py::TestCreateDonation::test_create_donation_missing_fields PASSED [ 71%]
-tests/test_routes_donations.py::TestGetAllDonations::test_get_all_donations PASSED [ 74%]
-tests/test_routes_donations.py::TestVerifyDonation::test_verify_donation_success PASSED [ 77%]
-tests/test_routes_donations.py::TestVerifyDonation::test_verify_donation_not_found PASSED [ 80%]
-tests/test_routes_donations.py::TestClaimDonation::test_claim_donation_success PASSED [ 82%]
-tests/test_routes_donations.py::TestClaimDonation::test_claim_already_assigned PASSED [ 85%]
-tests/test_routes_donations.py::TestClaimDonation::test_claim_expired_donation PASSED [ 88%]
-tests/test_routes_donations.py::TestClaimDonation::test_claim_donation_unauthenticated PASSED [ 91%]
-tests/test_routes_donations.py::TestVerifyPickup::test_verify_pickup_success PASSED [ 94%]
-tests/test_routes_donations.py::TestVerifyPickup::test_verify_pickup_wrong_ngo PASSED [ 97%]
-tests/test_routes_donations.py::TestVerifyPickup::test_verify_pickup_not_assigned PASSED [100%]
-================= 35 passed, 78 warnings in 84.32s (0:01:24) ==================
-```
+- **Total Tests:** 38
+- **Unit Tests:** 12
+- **Integration Tests:** 26
+- **Coverage:** Auth, Donations, Database Models, Security
