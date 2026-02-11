@@ -5,7 +5,7 @@ available donations, create, claim, verify, get all.
 import pytest
 from datetime import datetime, timedelta
 
-from models import DonationStatusEnum
+from models import DonationStatusEnum, NGOBranch, NGO, ApprovalStatusEnum
 
 
 # ============= GET /api/donations/available =============
@@ -215,3 +215,85 @@ class TestVerifyPickup:
         )
         # Could be 400 or 403 depending on order of checks
         assert response.status_code in (400, 403)
+
+
+# ============= Capacity & Multiple Location Logic =============
+
+
+class TestCapacityLogic:
+    """Tests for storage capacity enforcement."""
+
+    def test_claim_exceeds_ngo_capacity(
+        self, client, sample_donation, sample_user, auth_headers, db_session
+    ):
+        """Should return 403 if donation exceeds NGO total capacity."""
+        # Set NGO capacity to something small
+        ngo = db_session.query(NGO).get(sample_user.ngo_id)
+        ngo.storage_capacity = 5.0  # Max 5kg
+        sample_donation.quantity = 10.0  # Try to claim 10kg
+        db_session.flush()
+
+        response = client.patch(
+            f"/api/donations/{sample_donation.id}/status",
+            json={"new_status": "ASSIGNED"},
+            headers=auth_headers,
+        )
+        assert response.status_code == 403
+        assert "capacity exceeded" in response.json()["detail"].lower()
+
+
+class TestMultipleLocations:
+    """Tests for branch-specific claiming."""
+
+    def test_claim_for_specific_branch(
+        self, client, sample_donation, sample_user, auth_headers, db_session
+    ):
+        """Should successfully claim a donation for a specific branch."""
+        # Create a branch for the NGO
+        branch = NGOBranch(
+            ngo_id=sample_user.ngo_id,
+            name="Downtown Branch",
+            address="123 Main St",
+            storage_capacity=100.0,
+            is_active=1,
+        )
+        db_session.add(branch)
+        db_session.flush()
+
+        # Claim with branch_id
+        response = client.patch(
+            f"/api/donations/{sample_donation.id}/status",
+            json={"new_status": "ASSIGNED", "branch_id": branch.id},
+            headers=auth_headers,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["branch_id"] == branch.id
+        assert data["status"] == "ASSIGNED"
+
+    def test_claim_exceeds_branch_capacity(
+        self, client, sample_donation, sample_user, auth_headers, db_session
+    ):
+        """Should return 403 if donation exceeds specific branch capacity."""
+        # Create a small branch
+        branch = NGOBranch(
+            ngo_id=sample_user.ngo_id,
+            name="Small Branch",
+            address="Tiny St",
+            storage_capacity=5.0,  # Max 5kg
+            is_active=1,
+        )
+        db_session.add(branch)
+        db_session.flush()
+
+        sample_donation.quantity = 10.0  # Try to claim 10kg
+
+        # Claim with branch_id
+        response = client.patch(
+            f"/api/donations/{sample_donation.id}/status",
+            json={"new_status": "ASSIGNED", "branch_id": branch.id},
+            headers=auth_headers,
+        )
+        assert response.status_code == 403
+        assert "branch storage capacity exceeded" in response.json()["detail"].lower()
+
