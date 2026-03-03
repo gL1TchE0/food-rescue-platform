@@ -2,9 +2,9 @@ name: Backend CI
 
 on:
   push:
-    branches: [main]
+    branches: [CI]
   pull_request:
-    branches: [main]
+    branches: [CI]
   workflow_dispatch: {}
 
 jobs:
