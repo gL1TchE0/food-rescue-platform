@@ -179,7 +179,7 @@ export default function DispatcherDashboard() {
                         )}
                         <div className="flex items-center gap-2 text-sm">
                             <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                            <span className="text-slate-400">{volunteers.filter(v => v.is_available).length} volunteers online</span>
+                            <span className="text-slate-400">{volunteers.filter(v => v.status === "ONLINE").length} volunteers available</span>
                         </div>
                         <button onClick={logout} className="text-slate-400 hover:text-red-400 transition-colors">
                             <span className="material-symbols-outlined">logout</span>
@@ -190,6 +190,7 @@ export default function DispatcherDashboard() {
 
             {/* Main Content */}
             <main className="pt-24 px-6 pb-6 relative z-10 max-w-[1800px] mx-auto">
+<<<<<<< Updated upstream
                 {/* Stats Row */}
                 <div className="grid grid-cols-4 gap-4 mb-6">
                     <div className="glass-card p-4 relative">
@@ -198,6 +199,52 @@ export default function DispatcherDashboard() {
                             <div>
                                 <p className="text-3xl font-bold text-yellow-400">{tasksByStatus.pending.length}</p>
                                 <p className="text-sm text-slate-400">Pending</p>
+=======
+
+                {activeTab === "tasks" ? (
+                    <>
+                        {/* Stats Row */}
+                        <div className="grid grid-cols-4 gap-4 mb-6">
+                            <div className="glass-card p-4 relative">
+                                <div className="glass-highlight"></div>
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-3xl font-bold text-yellow-400">{tasksByStatus.pending.length}</p>
+                                        <p className="text-sm text-slate-400">Pending</p>
+                                    </div>
+                                    <span className="material-symbols-outlined text-yellow-400 text-3xl opacity-50">pending</span>
+                                </div>
+                            </div>
+                            <div className="glass-card p-4 relative">
+                                <div className="glass-highlight"></div>
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-3xl font-bold text-blue-400">{tasksByStatus.active.length}</p>
+                                        <p className="text-sm text-slate-400">Active Tasks</p>
+                                    </div>
+                                    <span className="material-symbols-outlined text-blue-400 text-3xl opacity-50">local_shipping</span>
+                                </div>
+                            </div>
+                            <div className="glass-card p-4 relative">
+                                <div className="glass-highlight"></div>
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-3xl font-bold text-green-400">{tasksByStatus.completed.length}</p>
+                                        <p className="text-sm text-slate-400">Completed Today</p>
+                                    </div>
+                                    <span className="material-symbols-outlined text-green-400 text-3xl opacity-50">check_circle</span>
+                                </div>
+                            </div>
+                            <div className="glass-card p-4 relative">
+                                <div className="glass-highlight"></div>
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-3xl font-bold text-[#fb923c]">{volunteers.filter(v => v.status === "ONLINE").length}</p>
+                                        <p className="text-sm text-slate-400">Available for Assignment</p>
+                                    </div>
+                                    <span className="material-symbols-outlined text-[#fb923c] text-3xl opacity-50">groups</span>
+                                </div>
+>>>>>>> Stashed changes
                             </div>
                             <span className="material-symbols-outlined text-yellow-400 text-3xl opacity-50">pending</span>
                         </div>

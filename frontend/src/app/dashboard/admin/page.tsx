@@ -206,7 +206,7 @@ export default function AdminDashboard() {
                                 { label: "Total Users", value: stats?.users.total || 0, icon: "group", color: "blue" },
                                 { label: "Donations", value: stats?.tasks.total || 0, icon: "inventory_2", color: "green" },
                                 { label: "Rescued (kg)", value: stats?.impact?.total_weight_kg || 0, icon: "scale", color: "orange" },
-                                { label: "Active Volunteers", value: (stats?.volunteers.online || 0) + (stats?.volunteers.busy || 0), icon: "local_shipping", color: "purple" },
+                                { label: "Active Volunteers (Online + Busy)", value: (stats?.volunteers.online || 0) + (stats?.volunteers.busy || 0), icon: "local_shipping", color: "purple" },
                                 { label: "Pending NGOs", value: stats?.ngos.pending || 0, icon: "pending", color: "yellow" },
                                 { label: "CO₂ Prevented (kg)", value: (stats?.impact?.co2_saved_kg || 0).toFixed(1), icon: "eco", color: "teal" },
                             ].map((stat, i) => (
